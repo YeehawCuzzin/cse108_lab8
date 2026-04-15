@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Your Courses</h1>
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>Course Name</th><th>Teacher</th><th>Time</th><th>Enrolled</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in student.enrollments %}
+      <tr>
+        <td><strong>{{ e.course.name }}</strong></td>
+        <td>{{ e.course.teacher.full_name }}</td>
+        <td>{{ e.course.schedule }}</td>
+        <td>
+          {{ e.course.enrolled_count }}/{{ e.course.capacity }}
+          {% if e.course.is_full %}
+            <span class="badge badge-full">Full</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" style="color:#888;text-align:center;padding:1.5rem">No courses yet — enroll below!</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2>All Available Courses</h2>
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>Course Name</th><th>Teacher</th><th>Time</th><th>Enrolled</th><th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for course in all_courses %}
+      <tr>
+        <td><strong>{{ course.name }}</strong></td>
+        <td>{{ course.teacher.full_name }}</td>
+        <td>{{ course.schedule }}</td>
+        <td>
+          {% set pct = (course.enrolled_count / course.capacity * 100)|int %}
+          {{ course.enrolled_count }}/{{ course.capacity }}
+          {% if course.is_full %}
+            <span class="badge badge-full">Full</span>
+          {% elif pct >= 75 %}
+            <span class="badge badge-warn">Almost full</span>
+          {% else %}
+            <span class="badge badge-ok">Open</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if course.id in enrolled_ids %}
+            <span class="badge badge-ok">✓ Enrolled</span>
+          {% elif course.is_full %}
+            <button class="btn btn-primary btn-sm" disabled>Full</button>
+          {% else %}
+            <form method="POST" action="{{ url_for('enroll', course_id=course.id) }}" style="display:inline">
+              <button class="btn btn-success btn-sm" type="submit">Add class</button>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

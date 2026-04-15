@@ -1,0 +1,74 @@
+# ACME University — Student Enrollment Web App
+### Lab 8 | Flask + SQLite + Flask-Admin
+
+---
+
+## Setup
+
+```bash
+pip install -r requirements.txt
+python app.py
+```
+
+Then open **http://127.0.0.1:5000**
+
+---
+
+## Demo Accounts (all passwords: `pass`)
+
+| Username     | Role    | Full Name         |
+|--------------|---------|-------------------|
+| cnorris      | student | Chuck Norris      |
+| mnorris      | student | Mindy Norris      |
+| jsantos      | student | Jose Santos       |
+| bbrown       | student | Betty Brown       |
+| jstuart      | student | John Stuart       |
+| lcheng       | student | Li Cheng          |
+| nlittle      | student | Nancy Little      |
+| aranganath   | student | Aditya Ranganath  |
+| ywchen       | student | Yi Wen Chen       |
+| ahepworth    | teacher | Ammon Hepworth    |
+| swalker      | teacher | Susan Walker      |
+| rjenkins     | teacher | Ralph Jenkins     |
+| admin        | admin   | Administrator     |
+
+---
+
+## Features
+
+### Database (SQLite via SQLAlchemy)
+- **Users table** — id, username, password_hash, full_name, role
+- **Courses table** — id, name, teacher_id (FK), schedule, capacity
+- **Enrollments table** — id, student_id (FK), course_id (FK), grade
+
+### Student View
+- See your enrolled courses (name, teacher, time, seats filled)
+- Browse all offered courses with open/full badges
+- Enroll in any course that hasn't hit capacity
+
+### Teacher View
+- See all courses you teach with enrollment counts
+- Click into a course to see the full roster
+- Edit individual student grades inline
+
+### Admin View (`/admin`)
+- Full CRUD on Users, Courses, and Enrollments via Flask-Admin
+- Protected — only accessible when logged in as `admin`
+
+---
+
+## Project Structure
+
+```
+enrollment_app/
+├── app.py              # Main app: models, routes, seed data
+├── requirements.txt
+├── templates/
+│   ├── base.html       # Shared nav + layout
+│   ├── login.html      # Login page
+│   ├── student.html    # Student dashboard
+│   ├── teacher.html    # Teacher dashboard
+│   └── roster.html     # Course roster + grade editing
+└── instance/
+    └── enrollment.db   # Created automatically on first run
+```

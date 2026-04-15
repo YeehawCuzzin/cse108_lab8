@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>University of California, Merced – Sign In</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #1a3a5c 0%, #2d6a9f 100%);
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .login-card {
+      background: white; border-radius: 14px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+      padding: 2.5rem 2.2rem; width: 360px;
+    }
+    .logo { text-align: center; margin-bottom: 1.8rem; }
+    .logo h1 { font-size: 1.6rem; color: #1a3a5c; font-weight: 800; letter-spacing: 0.5px; }
+    .logo h1 span { color: #f0c040; }
+    .logo p { color: #888; font-size: 0.85rem; margin-top: 0.3rem; }
+    label { display: block; font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 0.3rem; }
+    input[type=text], input[type=password] {
+      width: 100%; padding: 0.7rem 0.9rem; border: 1.5px solid #ddd;
+      border-radius: 7px; font-size: 0.95rem; margin-bottom: 1.1rem;
+      transition: border-color 0.2s;
+    }
+    input:focus { outline: none; border-color: #2d6a9f; }
+    button {
+      width: 100%; padding: 0.75rem; background: #1a3a5c; color: white;
+      border: none; border-radius: 7px; font-size: 1rem; font-weight: 700;
+      cursor: pointer; transition: background 0.2s;
+    }
+    button:hover { background: #2d6a9f; }
+    .alert { background: #f8d7da; color: #842029; border: 1px solid #f5c2c7;
+      padding: 0.6rem 0.9rem; border-radius: 6px; font-size: 0.88rem; margin-bottom: 1rem; }
+    .hint { margin-top: 1.2rem; font-size: 0.78rem; color: #aaa; text-align: center; }
+    .hint strong { color: #888; }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="logo">
+      <h1>🎓 <span>University of California, </span> Merced</h1>
+      <p>Student Enrollment System</p>
+    </div>
+    {% for cat, msg in get_flashed_messages(with_categories=True) %}
+      <div class="alert">{{ msg }}</div>
+    {% endfor %}
+    <form method="POST">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" placeholder="e.g. cnorris" required autofocus>
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="••••••••" required>
+      <button type="submit">Sign in</button>
+    </form>
+    <p class="hint">
+      Demo: <strong>students</strong> (cnorris, mnorris…) &nbsp;|&nbsp;
+      <strong>teacher</strong> ahepworth &nbsp;|&nbsp;
+      <strong>admin</strong> — all password: <em>pass</em>
+    </p>
+  </div>
+</body>
+</html>

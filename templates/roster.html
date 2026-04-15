@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+
+<a class="back-link" href="{{ url_for('teacher_dashboard') }}">← Back to Your Courses</a>
+
+<h1>{{ course.name }} Roster</h1>
+
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>Student Name</th>
+        <th>Grade</th>
+        <th>Update Grade</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for enrollment in course.enrollments %}
+      <tr>
+        <td><strong>{{ enrollment.student.full_name }}</strong></td>
+        <td>
+          {% if enrollment.grade is not none %}
+            {{ enrollment.grade }}
+          {% else %}
+            <span class="badge badge-warn">No grade</span>
+          {% endif %}
+        </td>
+        <td>
+          <form class="grade-form" method="POST" action="{{ url_for('update_grade', enrollment_id=enrollment.id) }}">
+            <input
+              type="number"
+              name="grade"
+              min="0"
+              max="100"
+              value="{{ enrollment.grade if enrollment.grade is not none else '' }}"
+              required
+            >
+            <button class="btn btn-success btn-sm" type="submit">Save</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="3" style="color:#888;text-align:center;padding:1.5rem">
+          No students enrolled in this course.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

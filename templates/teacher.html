@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Your Courses</h1>
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>Course Name</th><th>Time</th><th>Students Enrolled</th><th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for course in teacher.taught_courses %}
+      <tr>
+        <td><strong>{{ course.name }}</strong></td>
+        <td>{{ course.schedule }}</td>
+        <td>{{ course.enrolled_count }}/{{ course.capacity }}</td>
+        <td>
+          <a class="btn btn-primary btn-sm" href="{{ url_for('course_roster', course_id=course.id) }}">
+            View Roster
+          </a>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" style="color:#888;text-align:center;padding:1.5rem">No courses assigned.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
