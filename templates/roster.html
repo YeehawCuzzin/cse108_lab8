@@ -1,16 +1,28 @@
 {% extends "base.html" %}
 {% block content %}
 
-<a class="back-link" href="{{ url_for('teacher_dashboard') }}">← Back to Your Courses</a>
-
-<h1>{{ course.name }} Roster</h1>
+<div class="page-header">
+  <a class="back-link" href="{{ url_for('teacher_dashboard') }}">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;">
+      <line x1="19" y1="12" x2="5" y2="12"></line>
+      <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+    Back to Your Courses
+  </a>
+  <h1>{{ course.name }} Roster</h1>
+</div>
 
 <div class="card">
   <table>
+    <colgroup>
+      <col style="width: 50%;">
+      <col style="width: 20%;">
+      <col style="width: 30%;">
+    </colgroup>
     <thead>
       <tr>
         <th>Student Name</th>
-        <th>Grade</th>
+        <th>Current Grade</th>
         <th>Update Grade</th>
       </tr>
     </thead>
@@ -20,7 +32,7 @@
         <td><strong>{{ enrollment.student.full_name }}</strong></td>
         <td>
           {% if enrollment.grade is not none %}
-            {{ enrollment.grade }}
+            <span class="grade-text">{{ enrollment.grade }}%</span>
           {% else %}
             <span class="badge badge-warn">No grade</span>
           {% endif %}
@@ -32,6 +44,7 @@
               name="grade"
               min="0"
               max="100"
+              placeholder="0-100"
               value="{{ enrollment.grade if enrollment.grade is not none else '' }}"
               required
             >
@@ -41,8 +54,10 @@
       </tr>
       {% else %}
       <tr>
-        <td colspan="3" style="color:#888;text-align:center;padding:1.5rem">
-          No students enrolled in this course.
+        <td colspan="3">
+          <div class="empty-state">
+            <p>No students are currently enrolled in this course.</p>
+          </div>
         </td>
       </tr>
       {% endfor %}

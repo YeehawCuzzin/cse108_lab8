@@ -10,6 +10,8 @@ app.config['SECRET_KEY'] = 'acme-university-secret-key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///enrollment.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+app.config['FLASK_ADMIN_SWATCH'] = 'flatly' # <-- make it look nice heheheehh
+
 db = SQLAlchemy(app)
 
 # ── Models ────────────────────────────────────────────────────────────────────
@@ -67,7 +69,7 @@ class SecureModelView(ModelView):
         flash('Admin access required.', 'error')
         return redirect(url_for('login'))
 
-admin = Admin(app, name='ACME Admin')
+admin = Admin(app, name='UCM Admin Dashboard')
 admin.add_view(SecureModelView(User, db.session))
 admin.add_view(SecureModelView(Course, db.session))
 admin.add_view(SecureModelView(Enrollment, db.session))
@@ -184,6 +186,22 @@ def enroll(course_id):
             flash(f'Enrolled in {course.name}!', 'success')
     return redirect(url_for('student_dashboard'))
 
+@app.route('/student/drop/<int:course_id>', methods=['POST'])
+def drop_course(course_id):
+    if session.get('role') != 'student':
+        return redirect(url_for('login'))
+    
+    # Look for the specific enrollment record
+    enrollment = Enrollment.query.filter_by(student_id=session['user_id'], course_id=course_id).first()
+    
+    if enrollment:
+        db.session.delete(enrollment)
+        db.session.commit()
+        flash('Successfully dropped the course.', 'success')
+    else:
+        flash('You are not enrolled in this course.', 'error')
+        
+    return redirect(url_for('student_dashboard'))
 
 @app.route('/teacher')
 def teacher_dashboard():
