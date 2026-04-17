@@ -230,9 +230,17 @@ def update_grade(enrollment_id):
     if e.course.teacher_id != session['user_id']:
         flash('Access denied.', 'error')
         return redirect(url_for('teacher_dashboard'))
-    e.grade = request.form.get('grade', type=int)
-    db.session.commit()
-    flash('Grade updated.', 'success')
+ 
+    grade = request.form.get('grade', type=int)
+
+    # Validate grade input on the backend to ensure it is within the valid range (0–100)
+    if grade is None or grade < 0 or grade > 100:
+        flash('Grade must be between 0 and 100.', 'error')
+    else:
+        e.grade = grade
+        db.session.commit()
+        flash('Grade updated.', 'success')
+
     return redirect(url_for('course_roster', course_id=e.course_id))
 
 
