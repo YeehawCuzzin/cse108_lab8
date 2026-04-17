@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin, BaseView, expose
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_babel import Babel
 import os
 
 app = Flask(__name__)
@@ -13,6 +14,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['FLASK_ADMIN_SWATCH'] = 'flatly' # <-- make it look nice heheheehh
 
 db = SQLAlchemy(app)
+babel = Babel(app)
 
 # ── Models ────────────────────────────────────────────────────────────────────
 
@@ -272,6 +274,10 @@ def admin_dashboard():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        if not User.query.first():
-            seed()
+        try:
+            if not User.query.first():
+                seed()
+        except Exception as e:
+            print("DB seed check failed:", e)
+
     app.run(debug=True)
