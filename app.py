@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request, session, flash
 from flask_sqlalchemy import SQLAlchemy
-from flask_admin import Admin
+from flask_admin import Admin, BaseView, expose
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
@@ -27,7 +27,10 @@ class User(db.Model):
     enrollments = db.relationship('Enrollment', foreign_keys='Enrollment.student_id', backref='student', lazy=True)
     taught_courses = db.relationship('Course', backref='teacher', lazy=True)
 
+    # Passwords are securely hashed using Werkzeug before being stored in the database
     def set_password(self, pw): self.password_hash = generate_password_hash(pw)
+
+    # Verifies a plaintext password against the stored hashed password securely
     def check_password(self, pw): return check_password_hash(self.password_hash, pw)
     def __repr__(self): return self.full_name
 
@@ -45,6 +48,7 @@ class Course(db.Model):
     @property
     def enrolled_count(self): return len(self.enrollments)
     @property
+    # Determines if the course has reached its maximum enrollment capacity
     def is_full(self): return self.enrolled_count >= self.capacity
     def __repr__(self): return self.name
 
@@ -61,6 +65,13 @@ class Enrollment(db.Model):
 
 
 # ── Flask-Admin ───────────────────────────────────────────────────────────────
+class LogoutView(BaseView):
+    def is_accessible(self):
+        return session.get('role') == 'admin'
+
+    @expose('/')
+    def index(self):
+        return redirect(url_for('logout'))
 
 class SecureModelView(ModelView):
     def is_accessible(self):
@@ -73,6 +84,7 @@ admin = Admin(app, name='UCM Admin Dashboard')
 admin.add_view(SecureModelView(User, db.session))
 admin.add_view(SecureModelView(Course, db.session))
 admin.add_view(SecureModelView(Enrollment, db.session))
+admin.add_view(LogoutView(name='Logout'))
 
 
 # ── Seed Data ─────────────────────────────────────────────────────────────────
@@ -142,6 +154,10 @@ def seed():
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
+    # Redirect already logged-in users to their respective dashboards
+    if session.get('role'):
+        return redirect(url_for(session['role'] + '_dashboard'))
+
     if request.method == 'POST':
         u = User.query.filter_by(username=request.form['username']).first()
         if u and u.check_password(request.form['password']):
@@ -150,6 +166,7 @@ def login():
             session['full_name'] = u.full_name
             return redirect(url_for(u.role + '_dashboard'))
         flash('Invalid username or password.', 'error')
+
     return render_template('login.html')
 
 
@@ -174,6 +191,7 @@ def enroll(course_id):
     if session.get('role') != 'student':
         return redirect(url_for('login'))
     course = Course.query.get_or_404(course_id)
+    # Prevent enrollment if course is full or student is already enrolled
     if course.is_full:
         flash(f'{course.name} is full.', 'error')
     else:
